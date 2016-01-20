@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hello</title>
+</head>
+<body>
+<h1>{{.Message}}</h1>
+<input type="text" id="username" name="username" value="" autofocus>
+<!-- {{ range $key, $value := .Orgs }}
+   <li><strong>{{ $key }}</strong>: {{ $value.Name }}</li>
+{{ end }} -->
+<ul id="list">
+  <li>Repos Go Here</li>
+</ul>
+<script>
+  function fetchRepos(username, list) {
+    fetch('repos/' + username)
+    .then(function(response) {
+      return response.json();
+    }).then(function(res) {
+      list.innerHTML = ""; // clear innerHTML
+      res.forEach(function(item) {
+        list.innerHTML += '<li>' + item.name + '</li>';
+      });
+      window.previousVal = username;
+    }).catch(function(err) {
+      console.error(err);
+    });
+  }
+  window.previousVal = null;
+  document.addEventListener('DOMContentLoaded', function () {
+    var input = document.getElementById('username');
+    var list = document.getElementById('list');
+    input.addEventListener('keyup', function() {
+      // do an ajax save when this input is changed
+      var val = this.value;
+      // clear the timeout so we dont fire in succession
+      clearTimeout(this.delayer);
+      this.delayer = setTimeout(function () {
+        if (val != window.previousVal) {
+          fetchRepos(val, list);
+        } else {
+          console.log('repeat call blocked');
+        }
+      }, 500);
+    });
+  })
+</script>
+</body>
+</html>
